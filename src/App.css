@@ -1,0 +1,62 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"); */
+@import "tailwindcss";
+
+@theme inline {
+  --color-text: rgb(30, 41, 59);
+  --color-text-muted: rgb(100, 116, 139);
+  --color-teal: rgb(20, 184, 166);
+  --color-bg: rgb(236, 253, 245);
+  --font-font: Inter, sans-serif;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-small-1: float 4s ease-in-out infinite;
+  --animate-small-2: float 5s ease-in-out infinite;
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+@keyframes small-1 {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+@keyframes small-2 {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* index.css */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ecfdf5; /* Tailwind teal-50 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #14b8a6; /* Tailwind teal-500 */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #0d9488; /* Tailwind teal-700 */
+}
