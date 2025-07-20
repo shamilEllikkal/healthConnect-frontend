@@ -46,55 +46,33 @@ const BookAppointment = () => {
 
   const [toPayment, setToPayment] = useState(true);
 
+  const [doctorLoading, setDoctorLoading] = useState(false);
+
   // const [isDisabled, setIsDisabled] = useState(false);
 
   const [location, setLocation] = useState(null);
   const [specialty, setSpecialty] = useState(null);
   const [hospital, setHospital] = useState(null);
 
+  const hasRun = useRef(false);
+
   const locations = [
     { id: 1, label: "New York, NY", value: "new-york" },
     { id: 2, label: "Los Angeles, CA", value: "los-angeles" },
     { id: 3, label: "Chicago, IL", value: "chicago" },
     { id: 4, label: "Houston, TX", value: "houston" },
-    { id: 5, label: "Phoenix, AZ", value: "phoenix" },
-    { id: 6, label: "Philadelphia, PA", value: "philadelphia" },
-    { id: 7, label: "San Antonio, TX", value: "san-antonio" },
-    { id: 8, label: "San Diego, CA", value: "san-diego" },
-    { id: 9, label: "Dallas, TX", value: "dallas" },
-    { id: 10, label: "San Jose, CA", value: "san-jose" },
   ];
 
   const specialties = [
     { id: 1, label: "Cardiology", value: "cardiology" },
     { id: 2, label: "Dermatology", value: "dermatology" },
     { id: 3, label: "Emergency Medicine", value: "emergency-medicine" },
-    { id: 4, label: "Family Medicine", value: "family-medicine" },
-    { id: 5, label: "Internal Medicine", value: "internal-medicine" },
-    { id: 6, label: "Neurology", value: "neurology" },
-    { id: 7, label: "Oncology", value: "oncology" },
-    { id: 8, label: "Orthopedics", value: "orthopedics" },
-    { id: 9, label: "Pediatrics", value: "pediatrics" },
-    { id: 10, label: "Psychiatry", value: "psychiatry" },
-    { id: 11, label: "Radiology", value: "radiology" },
-    { id: 12, label: "Surgery", value: "surgery" },
   ];
 
   const hospitals = [
     { id: 1, label: "Mayo Clinic", value: "mayo-clinic" },
     { id: 2, label: "Cleveland Clinic", value: "cleveland-clinic" },
     { id: 3, label: "Johns Hopkins Hospital", value: "johns-hopkins" },
-    { id: 4, label: "Massachusetts General Hospital", value: "mass-general" },
-    { id: 5, label: "UCLA Medical Center", value: "ucla-medical" },
-    { id: 6, label: "Mount Sinai Hospital", value: "mount-sinai" },
-    { id: 7, label: "Cedars-Sinai Medical Center", value: "cedars-sinai" },
-    {
-      id: 8,
-      label: "NewYork-Presbyterian Hospital",
-      value: "newyork-presbyterian",
-    },
-    { id: 9, label: "Houston Methodist Hospital", value: "houston-methodist" },
-    { id: 10, label: "UCSF Medical Center", value: "ucsf-medical" },
   ];
 
   const CustomSelect = ({
@@ -292,9 +270,18 @@ const BookAppointment = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const dataOfDoctor = async () => {
-    await axios.get("/doctors").then((res) => {
-      setDoctorData(res.data);
-    });
+    setDoctorLoading(true);
+    await axios
+      .get("/doctors")
+      .then((res) => {
+        setDoctorData(res.data);
+      })
+      .catch(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+        toast.error("Network Error");
+      });
+    setDoctorLoading(false);
   };
 
   useEffect(() => {
@@ -430,74 +417,148 @@ const BookAppointment = () => {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4">
-                  {doctorData.map((doctor) => (
-                    <div
-                      key={doctor._id}
-                      className="p-6 max-sm:p-4 group flex flex-col items-center transform hover:-translate-y-1.5 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-out shadow-lg rounded-2xl "
-                    >
-                      <div className="bg-gray-200 w-20 h-20 rounded-2xl  border-0 border-teal-500"></div>
-                      <div className="text-center">
-                        <h1 className="font-semibold text-text text-lg group-hover:text-teal transition-colors pt-4">
-                          {doctor.doctor}
-                        </h1>
-                        <p className="text-teal-600 font-medium  pb-6">
-                          {doctor.speciality}
-                        </p>
-                      </div>
-                      <div className="space-y-3 pb-6 w-full">
-                        <div className="flex items-center text-sm text-text-muted">
-                          <div className="text-teal pr-2">
-                            <FontAwesomeIcon icon={faLocationDot} />
-                          </div>
-                          <h1>{doctor.hospital}</h1>
-                        </div>
-                        <div className="flex items-center text-sm text-text-muted">
-                          <div className="text-teal pr-2">
-                            <FontAwesomeIcon icon={faClock} />
-                          </div>
-                          <h1>{doctor.experience} years experience</h1>
-                        </div>
 
-                        <div className="flex justify-between">
-                          <div className="flex items-center text-sm text-text-muted">
-                            <div className="text-yellow-300 pr-2">
-                              <FontAwesomeIcon icon={faStar} />
-                            </div>
-                            <h1>
-                              <span className="text-text font-bold text-md">
-                                4.9
-                              </span>{" "}
-                              (124 reviews)
-                            </h1>
+                <div>
+                  {doctorLoading ? (
+                    <div className="w-full grid grid-cols-3 max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4 ">
+                      <div className="grid grid-cols-1  gap-4 animate-pulse">
+                        <div className="p-6 bg-white rounded-lg  shadow-sm border space-y-6 border-gray-100">
+                          <div className="w-full flex flex-col gap-3 justify-center items-center">
+                            <div className="h-20 self w-20 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
+                            <div className="h-5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-600 w-3/4"></div>
+                            <div className="h-5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-600 w-2/4"></div>
                           </div>
-                          <h1 className="text-[rgb(6,182,212)]">
-                            ${doctor.price}
-                          </h1>
+                          <div className="space-y-4 ">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-5/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-5/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-800 w-6/6"></div>
+                          </div>
+
+                          <div className="space-y-4 ">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-2/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 "></div>
+                          </div>
+                          <div className="w-full flex flex-col gap-3 justify-center items-center">
+                            <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
+                          </div>
                         </div>
                       </div>
-                      <div className="self-start">
-                        <h1 className="text-xs  text-start text-text-muted mb-3 font-medium">
-                          Available today:
-                        </h1>
-                        <div className="flex flex-wrap gap-2 text-center">
-                          {times.map((time) => (
-                            <div className="inline-flex w-18 h-5 items-center justify-center rounded-full border px-2 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-xs border-teal-200 text-teal-600 bg-teal-50">
-                              <h1>{time.time}</h1>
-                            </div>
-                          ))}
+                      <div className="grid grid-cols-1  gap-4 animate-pulse">
+                        <div className="p-6 bg-white rounded-lg  shadow-sm border space-y-6 border-gray-100">
+                          <div className="w-full flex flex-col gap-3 justify-center items-center">
+                            <div className="h-20 self w-20 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
+                            <div className="h-5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-600 w-3/4"></div>
+                            <div className="h-5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-600 w-2/4"></div>
+                          </div>
+                          <div className="space-y-4 ">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-5/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-5/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-800 w-6/6"></div>
+                          </div>
+
+                          <div className="space-y-4 ">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-2/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 "></div>
+                          </div>
+                          <div className="w-full flex flex-col gap-3 justify-center items-center">
+                            <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
+                          </div>
                         </div>
                       </div>
-                      <div className="pt-6  w-full">
-                        <button
-                          onClick={() => handleConfirm(doctor._id)}
-                          className=" inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 h-10 px-4 py-2 w-full gradient-teal text-white hover:shadow-lg transition-all duration-300"
-                        >
-                          Book Appointment
-                        </button>
+                      <div className="grid grid-cols-1  gap-4 animate-pulse">
+                        <div className="p-6 bg-white rounded-lg  shadow-sm border space-y-6 border-gray-100">
+                          <div className="w-full flex flex-col gap-3 justify-center items-center">
+                            <div className="h-20 self w-20 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
+                            <div className="h-5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-600 w-3/4"></div>
+                            <div className="h-5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-600 w-2/4"></div>
+                          </div>
+                          <div className="space-y-4 ">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-5/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-5/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-800 w-6/6"></div>
+                          </div>
+
+                          <div className="space-y-4 ">
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 w-2/6"></div>
+                            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-700 "></div>
+                          </div>
+                          <div className="w-full flex flex-col gap-3 justify-center items-center">
+                            <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="grid grid-cols-3 max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4">
+                      {doctorData.map((doctor) => (
+                        <div
+                          key={doctor._id}
+                          className="p-6 max-sm:p-4 group flex flex-col items-center transform hover:-translate-y-1.5 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-out shadow-lg rounded-2xl "
+                        >
+                          <div className="bg-gray-200 w-20 h-20 rounded-2xl  border-0 border-teal-500"></div>
+                          <div className="text-center">
+                            <h1 className="font-semibold text-text text-lg group-hover:text-teal transition-colors pt-4">
+                              {doctor.doctor}
+                            </h1>
+                            <p className="text-teal-600 font-medium  pb-6">
+                              {doctor.speciality}
+                            </p>
+                          </div>
+                          <div className="space-y-3 pb-6 w-full">
+                            <div className="flex items-center text-sm text-text-muted">
+                              <div className="text-teal pr-2">
+                                <FontAwesomeIcon icon={faLocationDot} />
+                              </div>
+                              <h1>{doctor.hospital}</h1>
+                            </div>
+                            <div className="flex items-center text-sm text-text-muted">
+                              <div className="text-teal pr-2">
+                                <FontAwesomeIcon icon={faClock} />
+                              </div>
+                              <h1>{doctor.experience} years experience</h1>
+                            </div>
+
+                            <div className="flex justify-between">
+                              <div className="flex items-center text-sm text-text-muted">
+                                <div className="text-yellow-300 pr-2">
+                                  <FontAwesomeIcon icon={faStar} />
+                                </div>
+                                <h1>
+                                  <span className="text-text font-bold text-md">
+                                    4.9
+                                  </span>{" "}
+                                  (124 reviews)
+                                </h1>
+                              </div>
+                              <h1 className="text-[rgb(6,182,212)]">
+                                ${doctor.price}
+                              </h1>
+                            </div>
+                          </div>
+                          <div className="self-start">
+                            <h1 className="text-xs  text-start text-text-muted mb-3 font-medium">
+                              Available today:
+                            </h1>
+                            <div className="flex flex-wrap gap-2 text-center">
+                              {times.map((time) => (
+                                <div className="inline-flex w-18 h-5 items-center justify-center rounded-full border px-2 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-xs border-teal-200 text-teal-600 bg-teal-50">
+                                  <h1>{time.time}</h1>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="pt-6  w-full">
+                            <button
+                              onClick={() => handleConfirm(doctor._id)}
+                              className=" inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 h-10 px-4 py-2 w-full gradient-teal text-white hover:shadow-lg transition-all duration-300"
+                            >
+                              Book Appointment
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               {appointment && (

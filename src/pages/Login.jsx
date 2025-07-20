@@ -22,6 +22,9 @@ const schema = yup.object().shape({
 });
 
 const Login = () => {
+
+  const [authLoading,setAuthLoading] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -34,11 +37,10 @@ const Login = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    console.log(data)
+    setAuthLoading(true)
  await axios.post("/auth/login", data).then((res) => {
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      console.log(res.data)
     if( res.data.user.role=== "admin"){
       navigate("/admin")
     }else{
@@ -49,6 +51,7 @@ const Login = () => {
       toast.error("User not Found")
     })
     reset(); // Clear form
+    setAuthLoading(false)
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -148,8 +151,9 @@ const Login = () => {
                 Forgot Password?
               </a>
             </div>
-            <button className=" text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition  duration-300 ease-in-out ">
-              Sign In
+            
+            <button className=" flex items-center justify-center text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition  duration-300 ease-in-out ">
+             {authLoading ? (<div className="w-7 h-7 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : ("Sign Up")}
             </button>
           </form>
         </div>
