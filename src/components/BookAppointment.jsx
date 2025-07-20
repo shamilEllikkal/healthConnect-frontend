@@ -54,6 +54,11 @@ const BookAppointment = () => {
   const [specialty, setSpecialty] = useState(null);
   const [hospital, setHospital] = useState(null);
 
+  const [bookLoading,setBookLoading] = useState(null);
+  const[PaymentLoading,setPaymentLoading] = useState(false)
+
+  
+
   const hasRun = useRef(false);
 
   const locations = [
@@ -194,6 +199,7 @@ const BookAppointment = () => {
   };
 
   const handleProceed = () => {
+    setPaymentLoading(true)
     const { doctor, hospital, speciality, user_id, price } = Doctor;
     const { time } = Time;
 
@@ -221,7 +227,9 @@ const BookAppointment = () => {
 
         toast.error("already booked");
         console.log("an error occured", err);
-      });
+      }).finally(()=>{
+        setPaymentLoading(false)
+      })
   };
 
   const handleClose = () => {
@@ -254,17 +262,19 @@ const BookAppointment = () => {
   const navigate = useNavigate();
 
   const handleConfirm = async (id) => {
+    setBookLoading(id)
     const res = await axios.get(`/user/profile/${user.id}`);
     const { phone, dob, address, gender, bloodGroup } = res.data;
     if (!phone || !dob || !address || !gender || !bloodGroup) {
       toast.error("Please Fill your details");
       navigate("/dashboard/profile");
     }
-    const data = doctorData.find((d) => d._id === id);
+    const data = doctorData.find((d) => d._id === id)
     if (data) {
       setDoctor(data);
     }
     setAppointment(true);
+    setBookLoading(null)
   };
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -552,7 +562,7 @@ const BookAppointment = () => {
                               onClick={() => handleConfirm(doctor._id)}
                               className=" inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 h-10 px-4 py-2 w-full gradient-teal text-white hover:shadow-lg transition-all duration-300"
                             >
-                              Book Appointment
+                          {bookLoading === doctor._id ? (<div className="w-6 h-6 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : (" Book Appointment")}   
                             </button>
                           </div>
                         </div>
@@ -572,7 +582,7 @@ const BookAppointment = () => {
                         className="inline-flex items-center justify-center whitespace-nowrap text-xl font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-white text-text h-9 rounded-xl px-3 hover:bg-teal "
                         onClick={handleClose}
                       >
-                        {" "}
+                       
                         <FontAwesomeIcon icon={faXmark} />
                       </button>
                     </div>
@@ -741,7 +751,8 @@ const BookAppointment = () => {
                                   onClick={handleProceed}
                                   className="inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 px-4 py-2 flex-1 h-12 gradient-teal text-white hover:shadow-lg transition-all duration-300"
                                 >
-                                  Proceed To Payment
+                                                        {PaymentLoading ? (<div className="w-6 h-6 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : (" Proceed To Payment")}   
+
                                 </button>
                               </div>
                             </div>
