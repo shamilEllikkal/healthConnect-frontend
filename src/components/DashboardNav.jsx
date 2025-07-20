@@ -29,7 +29,7 @@ const toggleVisibility = useVisibilityStore((state)=>state.toggleVisibility);
             </div>
        <Link className="flex  gap-2.5 items-center" to="/dashboard/profile">  
               <div className="">
-             <img className="w-9 h-9 rounded-3xl flex items-center justify-cente" src={user.profile} alt="" />
+             <img className="w-9 h-9 rounded-3xl flex items-center justify-cente" src={user.profile === "" ? "/defaultprofile.jpg" : user.profile  } alt="" />
               </div>
               <div>
                 <h1 className="text-text text-sm  font-medium">{properName}</h1>

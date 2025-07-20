@@ -161,7 +161,7 @@ setSaveLoading(true)
                           <img
                             loading="lazy"
                             className="w-32 relative h-32 rounded-full object-cover border-4 border-gray-200"
-                            src={user.profile}
+                           src={user.profile === "" ? "/defaultprofile.jpg" : user.profile  }
                             alt=""
                           />
                         </div>

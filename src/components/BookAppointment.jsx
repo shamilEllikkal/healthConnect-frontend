@@ -307,7 +307,7 @@ const BookAppointment = () => {
                 <div>
                   <img
                     className=" w-20 h-20 rounded-full max-lg:order-1 border-4 border-teal-500"
-                    src={user.profile}
+                    src={user.profile === "" ? "/defaultprofile.jpg" : user.profile  }
                     alt=""
                   />
                 </div>
