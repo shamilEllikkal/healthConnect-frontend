@@ -2,13 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import DashboardNav from "./DashboardNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  ChevronDown,
-  Check,
-  MapPin,
-  Stethoscope,
-  Building2,
-} from "lucide-react";
-import {
   faCalendar,
   faUser,
   faClock,
@@ -21,7 +14,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "../axiosInstance.js";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import Select from "react-select";
 
 const BookAppointment = () => {
   useEffect(() => {
@@ -48,149 +42,160 @@ const BookAppointment = () => {
 
   const [doctorLoading, setDoctorLoading] = useState(false);
 
-  // const [isDisabled, setIsDisabled] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [location, setLocation] = useState(null);
-  const [specialty, setSpecialty] = useState(null);
-  const [hospital, setHospital] = useState(null);
+  const [bookLoading, setBookLoading] = useState(null);
+  const [PaymentLoading, setPaymentLoading] = useState(false);
 
-  const [bookLoading,setBookLoading] = useState(null);
-  const[PaymentLoading,setPaymentLoading] = useState(false)
+  const [selectSpeciality, setSelectSpeciality] = useState([]);
+  const [selectHospital, setSelectHospital] = useState([]);
+  const [selectLocation, setSelectLocation] = useState([]);
 
-  
+
+
+  const [selectedFilters, setSelectedFilters] = useState({
+    location: null,
+    speciality: null,
+    doctor: null,
+  });
 
   const hasRun = useRef(false);
 
-  const locations = [
-    { id: 1, label: "New York, NY", value: "new-york" },
-    { id: 2, label: "Los Angeles, CA", value: "los-angeles" },
-    { id: 3, label: "Chicago, IL", value: "chicago" },
-    { id: 4, label: "Houston, TX", value: "houston" },
-  ];
+  const handleFilterChange = (field, selectedOption) => {
+    // Update selected state
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [field]: selectedOption,
+    }));
 
-  const specialties = [
-    { id: 1, label: "Cardiology", value: "cardiology" },
-    { id: 2, label: "Dermatology", value: "dermatology" },
-    { id: 3, label: "Emergency Medicine", value: "emergency-medicine" },
-  ];
+    // Update search params
+    const newParams = new URLSearchParams(searchParams);
+    if (selectedOption) {
+      newParams.set(field, selectedOption.value);
+    } else {
+      newParams.delete(field);
+    }
+    setSearchParams(newParams);
+  };
 
-  const hospitals = [
-    { id: 1, label: "Mayo Clinic", value: "mayo-clinic" },
-    { id: 2, label: "Cleveland Clinic", value: "cleveland-clinic" },
-    { id: 3, label: "Johns Hopkins Hospital", value: "johns-hopkins" },
-  ];
+  useEffect(() => {
+    if (
+      selectLocation.length === 0 ||
+      selectSpeciality.length === 0 ||
+      selectHospital.length === 0
+    )
+      return;
 
-  const CustomSelect = ({
-    label,
-    placeholder,
-    options,
-    value,
-    onChange,
-    icon: Icon,
-  }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
+    const location = selectLocation.find(
+      (opt) => opt.value === searchParams.get("location")
+    );
+    const speciality = selectSpeciality.find(
+      (opt) => opt.value === searchParams.get("speciality")
+    );
+    const hospital = selectHospital.find(
+      (opt) => opt.value === searchParams.get("hospital")
+    );
 
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (
-          dropdownRef.current &&
-          !dropdownRef.current.contains(event.target)
-        ) {
-          setIsOpen(false);
-        }
-      };
+    setSelectedFilters({
+      location: location || null,
+      speciality: speciality || null,
+      hospital: hospital || null,
+    });
+  }, [selectLocation, selectSpeciality, selectHospital, searchParams]);
 
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  const [query, setQuery] = useState(searchParams.get("search") || "");
 
-    const handleSelect = (option) => {
-      onChange(option);
-      setIsOpen(false);
-    };
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.set("search", value);
+      return params;
+    });
+  };
 
-    const toggleDropdown = () => {
-      setIsOpen(!isOpen);
-    };
+  const filtered = doctorData.filter((item) => {
+    const doctorName = item.doctor?.toLowerCase() || "";
+    const words = query?.toLowerCase().trim().split(/\s+/) || [];
+
+    const matchesSearch = words.every((word) => doctorName.includes(word));
+
+    const specialityName = item.speciality?.toLowerCase() || "";
+    const spec =
+     searchParams.get("speciality")?.toLowerCase().trim().split(/\s+/) || [];
+
+    const matchesSpeciality = spec.every((spec) =>
+      specialityName.includes(spec)
+    );
+
+    const hospitalName = item.hospital?.toLowerCase() || "";
+    const hos =
+     searchParams.get("hospital")?.toLowerCase().trim().split(/\s+/) || [];
+
+    const matchesHospital = hos.every((hos) => hospitalName.includes(hos));
+
+    const locationName = item.hospital?.toLowerCase() || "";
+    const loc =
+      searchParams.get("location")?.toLowerCase().trim().split(/\s+/) || [];
+
+    const matchesLocation = loc.every((loc) => locationName.includes(loc));
 
     return (
-      <div className="relative" ref={dropdownRef}>
-        <label className="block text-sm font-semibold text-text mb-3">
-          {label}
-        </label>
-
-        <button
-          onClick={toggleDropdown}
-          className={`
-            w-full px-4 py-4 text-left bg-white border-2 rounded-xl
-            shadow-sm hover:shadow-md transition-all duration-200
-            focus:outline-none focus:ring-4 focus:ring-blue-100
-            ${
-              isOpen
-                ? "border-blue-500 shadow-lg ring-4 ring-blue-100"
-                : "border-gray-200 hover:border-gray-300"
-            }
-          `}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              {Icon && <Icon className="w-5 h-5 text-text-muted" />}
-              <span
-                className={`
-                ${value ? "text-gray-900 font-medium" : "text-gray-500"}
-              `}
-              >
-                {value ? value.label : placeholder}
-              </span>
-            </div>
-            <ChevronDown
-              className={`
-                w-5 h-5 text-gray-400 transition-transform duration-200
-                ${isOpen ? "transform rotate-180" : ""}
-              `}
-            />
-          </div>
-        </button>
-
-        <div
-          className={`
-          absolute z-50 w-full mt-2 bg-white border border-gray-200 
-          rounded-xl shadow-xl transition-all duration-200 origin-top
-          ${
-            isOpen
-              ? "opacity-100 scale-100 visible"
-              : "opacity-0 scale-95 invisible"
-          }
-        `}
-        >
-          <div className="py-2 max-h-64 overflow-y-auto">
-            {options.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => handleSelect(option)}
-                className={`
-                  w-full px-4 py-3 text-left flex items-center justify-between
-                  transition-colors duration-150 hover:bg-blue-50
-                  ${
-                    value?.id === option.id
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-700 hover:text-blue-600"
-                  }
-                `}
-              >
-                <span className="font-medium">{option.label}</span>
-                {value?.id === option.id && (
-                  <Check className="w-4 h-4 text-blue-600" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      matchesSearch && matchesSpeciality && matchesHospital && matchesLocation
     );
+  });
+
+  const getDoctors = async () => {
+    try {
+      const res = await axios.get("/doctors");
+      const data = res.data;
+
+      // Create an array of unique specialties
+      const uniqueSpecialities = Array.from(
+        new Set(data.map((spe) => spe.speciality))
+      ).map((spec) => ({
+        value: spec,
+        label: spec,
+      }));
+
+      const uniqueHospitals = Array.from(
+        new Set(data.map((spe) => spe.hospital))
+      ).map((spec) => ({
+        value: spec,
+        label: spec,
+      }));
+
+      setSelectHospital(uniqueHospitals);
+      setSelectSpeciality(uniqueSpecialities);
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  const getLocation = async () => {
+    try {
+      const res = await axios.get("/hospitals");
+      const data = res.data;
+
+      const uniqueLocations = Array.from(new Set(data.map((loc) => loc))).map(
+        (loc) => ({
+          label: loc.hospital_address.split(",")[1],
+          value: loc.hospital,
+        })
+      );
+
+      setSelectLocation(uniqueLocations);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    // console.log(searchParams.get("location") || "")
+    getDoctors();
+    getLocation();
+  }, []);
 
   const handleClick = (day) => {
     setSelected(day.fullDate);
@@ -199,7 +204,7 @@ const BookAppointment = () => {
   };
 
   const handleProceed = () => {
-    setPaymentLoading(true)
+    setPaymentLoading(true);
     const { doctor, hospital, speciality, user_id, price } = Doctor;
     const { time } = Time;
 
@@ -227,9 +232,10 @@ const BookAppointment = () => {
 
         toast.error("already booked");
         console.log("an error occured", err);
-      }).finally(()=>{
-        setPaymentLoading(false)
       })
+      .finally(() => {
+        setPaymentLoading(false);
+      });
   };
 
   const handleClose = () => {
@@ -262,19 +268,19 @@ const BookAppointment = () => {
   const navigate = useNavigate();
 
   const handleConfirm = async (id) => {
-    setBookLoading(id)
+    setBookLoading(id);
     const res = await axios.get(`/user/profile/${user.id}`);
     const { phone, dob, address, gender, bloodGroup } = res.data;
     if (!phone || !dob || !address || !gender || !bloodGroup) {
       toast.error("Please Fill your details");
       navigate("/dashboard/profile");
     }
-    const data = doctorData.find((d) => d._id === id)
+    const data = doctorData.find((d) => d._id === id);
     if (data) {
       setDoctor(data);
     }
     setAppointment(true);
-    setBookLoading(null)
+    setBookLoading(null);
   };
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -317,7 +323,9 @@ const BookAppointment = () => {
                 <div>
                   <img
                     className=" w-20 h-20 rounded-full max-lg:order-1 border-4 border-teal-500"
-                    src={user.profile === "" ? "/defaultprofile.jpg" : user.profile  }
+                    src={
+                      user.profile === "" ? "/defaultprofile.jpg" : user.profile
+                    }
                     alt=""
                   />
                 </div>
@@ -376,6 +384,7 @@ const BookAppointment = () => {
                     Browse our network of certified healthcare professionals
                   </h1>
                 </div>
+
                 <div className="px-6 max-sm:px-4 pb-6">
                   <div className="grid max-xl:grid-cols-2 max-lg:grid-cols-1 grid-cols-4 gap-5 items-center">
                     <div className="relative self-end ">
@@ -386,48 +395,79 @@ const BookAppointment = () => {
 
                       <input
                         className=" text-text
-            w-full pr-3 pl-10 py-4 text-left bg-white border-2 rounded-xl
-            shadow-sm hover:shadow-md transition-all duration-200
-            focus:outline-none focus:ring-4 focus:ring-blue-100
-              focus:border-blue-500 focus:shadow-lg 
-              border-gray-200 hover:border-gray-300"
+            w-full pr-3 pl-10 py-4 text-left bg-white border-1 rounded-[8px]                    
+            focus:outline-none focus:ring-2 focus:ring-blue-500
+             focus:border-0
+              border-black/25 hover:border-black/30"
                         type="text"
+                        value={query}
+                        onChange={handleSearchChange}
                         placeholder="search doctors..."
                       />
                     </div>
+                    <Select
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          height: "58px",
 
-                    {/* Location Select */}
-                    <CustomSelect
-                      label="Location"
-                      placeholder="Select a location..."
-                      options={locations}
-                      value={location}
-                      onChange={setLocation}
-                      icon={MapPin}
+                          borderRadius: "8px",
+
+                          "&:hover": {
+                            borderColor: state.isFocused ? "" : "#BDBDBD",
+                          },
+                        }),
+                      }}
+                      isSearchable
+                      isClearable
+                      placeholder="All Locations"
+                      options={selectLocation}
+                      value={selectedFilters.location}
+                      onChange={(e) => handleFilterChange("location", e)}
                     />
+                    <Select
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          height: "58px",
 
-                    {/* Specialty Select */}
-                    <CustomSelect
-                      label="Medical Specialty"
-                      placeholder="Select a specialty..."
-                      options={specialties}
-                      value={specialty}
-                      onChange={setSpecialty}
-                      icon={Stethoscope}
+                          borderRadius: "8px",
+
+                          "&:hover": {
+                            borderColor: state.isFocused ? "" : "#BDBDBD",
+                          },
+                        }),
+                      }}
+                      isSearchable
+                      isClearable
+                      placeholder="All Specialities"
+                      options={selectSpeciality}
+                      value={selectedFilters.speciality}
+                      onChange={(e) => handleFilterChange("speciality", e)}
                     />
+                    <Select
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          height: "58px",
 
-                    {/* Hospital Select */}
-                    <CustomSelect
-                      label="Hospital"
-                      placeholder="Select a hospital..."
-                      options={hospitals}
-                      value={hospital}
-                      onChange={setHospital}
-                      icon={Building2}
+                          borderRadius: "8px",
+
+                          "&:hover": {
+                            borderColor: state.isFocused ? "" : "#BDBDBD",
+                          },
+                        }),
+                      }}
+                      isSearchable
+                      isClearable
+                      placeholder="All Hospitals"
+                      options={selectHospital}
+                      value={selectedFilters.hospital}
+                      onChange={(e) => handleFilterChange("hospital", e)}
                     />
                   </div>
                 </div>
-
+                <div className="justify-end p-6 pt-0 relative flex"></div>
                 <div>
                   {doctorLoading ? (
                     <div className="w-full grid grid-cols-3 max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4 ">
@@ -499,11 +539,11 @@ const BookAppointment = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3 max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4">
-                      {doctorData.map((doctor) => (
+                    <div className="grid grid-cols-3  max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4">
+                      {filtered.map((doctor) => (
                         <div
                           key={doctor._id}
-                          className="p-6 max-sm:p-4 group flex flex-col items-center transform hover:-translate-y-1.5 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-out shadow-lg rounded-2xl "
+                          className="p-6 max-sm:p-4 bg-bg  group flex flex-col items-center transform hover:-translate-y-1.5 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-out shadow-lg rounded-2xl "
                         >
                           <div className="bg-gray-200 w-20 h-20 rounded-2xl  border-0 border-teal-500"></div>
                           <div className="text-center">
@@ -562,7 +602,11 @@ const BookAppointment = () => {
                               onClick={() => handleConfirm(doctor._id)}
                               className=" inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 h-10 px-4 py-2 w-full gradient-teal text-white hover:shadow-lg transition-all duration-300"
                             >
-                          {bookLoading === doctor._id ? (<div className="w-6 h-6 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : (" Book Appointment")}   
+                              {bookLoading === doctor._id ? (
+                                <div className="w-6 h-6 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>
+                              ) : (
+                                " Book Appointment"
+                              )}
                             </button>
                           </div>
                         </div>
@@ -573,7 +617,7 @@ const BookAppointment = () => {
               </div>
               {appointment && (
                 <div className=" fixed inset-0 bg-black/40 z-60 backdrop-blur-sm min-h-dvh overflow-y-auto   ">
-                  <div className="absolute top-1/2 left-1/2 bg-white -translate-x-1/2 -translate-y-1/2 w-[666px] max-h-[668px] overflow-y-auto rounded-xl">
+                  <div className="absolute top-1/2 left-1/2 bg-white max-md:bg-teal max-sm:bg-amber-400 max-md:w-full -translate-x-1/2 -translate-y-1/2 w-[666px] max-h-[668px] overflow-y-auto rounded-xl">
                     <div className="flex justify-between w-full  border-b-gray-200 border-b-1 p-6 ">
                       <h1 className=" text-2xl font-bold text-text">
                         Book Appointment
@@ -582,16 +626,15 @@ const BookAppointment = () => {
                         className="inline-flex items-center justify-center whitespace-nowrap text-xl font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-white text-text h-9 rounded-xl px-3 hover:bg-teal "
                         onClick={handleClose}
                       >
-                       
                         <FontAwesomeIcon icon={faXmark} />
                       </button>
                     </div>
                     <div className="p-8 max-sm:p-4 space-y-8">
-                      <div className="bg-bg rounded-2xl flex gap-8 p-6 items-center ">
+                      <div className="bg-bg rounded-2xl flex max-sm:flex-col gap-8 p-6 items-center ">
                         <div className="bg-gray-200 w-20 h-20 rounded-2xl  border-0 border-teal-500"></div>
 
                         {Doctor && (
-                          <div>
+                          <div className=" max-sm:text-center">
                             <h1 className="font-semibold text-text text-xl">
                               {Doctor.doctor}
                             </h1>
@@ -611,7 +654,7 @@ const BookAppointment = () => {
                       {toPayment ? (
                         <div>
                           {" "}
-                          <div className="font-semibold text-text pb-4 flex flex-col text-lg">
+                          <div className="font-semibold text-text pb-4  flex flex-col text-lg">
                             <div className="flex gap-3 pb-4">
                               <div className="text-teal">
                                 {" "}
@@ -620,7 +663,7 @@ const BookAppointment = () => {
 
                               <h1 className="">Select Date</h1>
                             </div>
-                            <div className="grid grid-cols-5 gap-3">
+                            <div className="flex flex-wrap justify-center gap-3">
                               {days.map((day) => (
                                 <div
                                   key={day.date}
@@ -649,7 +692,7 @@ const BookAppointment = () => {
                                 </div>
                                 <h1 className="">Select Time</h1>
                               </div>
-                              <div className="grid grid-cols-3 gap-3">
+                              <div className="flex flex-wrap max-sm:justify-center gap-3">
                                 {times.map((time, index) => (
                                   <div
                                     key={index}
@@ -751,8 +794,11 @@ const BookAppointment = () => {
                                   onClick={handleProceed}
                                   className="inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 px-4 py-2 flex-1 h-12 gradient-teal text-white hover:shadow-lg transition-all duration-300"
                                 >
-                                                        {PaymentLoading ? (<div className="w-6 h-6 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : (" Proceed To Payment")}   
-
+                                  {PaymentLoading ? (
+                                    <div className="w-6 h-6 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>
+                                  ) : (
+                                    " Proceed To Payment"
+                                  )}
                                 </button>
                               </div>
                             </div>

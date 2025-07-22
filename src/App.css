@@ -10,7 +10,10 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-small-1: float 4s ease-in-out infinite;
   --animate-small-2: float 5s ease-in-out infinite;
+  --animate-right:slideRight 0.8s ease-out;
 }
+
+
 @keyframes float {
   0%,
   100% {

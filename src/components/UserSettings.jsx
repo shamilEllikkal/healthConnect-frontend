@@ -1,21 +1,15 @@
-import React from "react";
-import DashboardNav from "./DashboardNav";
+import React from 'react';
 
 const UserSettings = () => {
   return (
-    <>
-      <div className="pl-64 max-sm:pl-0">
-        <div className=" w-full flex flex-col">
-          <DashboardNav />
-          <div className="pt-16">
-            <div className="bg-bg h-screen ">
-           
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+   <div></div>
   );
 };
 
 export default UserSettings;
+
+ //label on save Changes
+           //disabled on booking
+           //same email diff pass issue
+           //input select fetch data and search
+           //google integration

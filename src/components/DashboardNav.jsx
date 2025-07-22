@@ -17,7 +17,7 @@ const toggleVisibility = useVisibilityStore((state)=>state.toggleVisibility);
   const properName = user.name.charAt(0).toUpperCase()+(user.name.slice(1).toLowerCase());
 
   return (
- <div className="flex gap-5 justify-between  fixed z-9 h-16 w-full bg-white  ">
+ <div className="flex gap-5 justify-between  fixed z-9 h-16 w-full bg-white/80 backdrop-blur-[4px] ">
     <div className="flex gap-5">
             <div className="relative w-11  flex items-center justify-center text-text ">
               <div className="text-xl">

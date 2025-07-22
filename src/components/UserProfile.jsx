@@ -196,7 +196,7 @@ setSaveLoading(true)
                 <div>
                     <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
                 </div>
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid max-md:grid-cols-1 grid-cols-2 gap-6">
                   <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
                   <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
                   <div className="h-15 self w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded-lg animate-[shimmer_2s_infinite] delay-500"></div>
