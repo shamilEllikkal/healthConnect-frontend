@@ -10,10 +10,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useState } from "react";
-import { Link, Links ,useNavigate } from "react-router-dom";
+import { Link, Links, useNavigate } from "react-router-dom";
 import axios from "../axiosInstance.js";
-import toast from 'react-hot-toast';
-
+import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+import { GoogleLogin } from "@react-oauth/google";
 
 const schema = yup.object().shape({
   name: yup
@@ -33,9 +34,36 @@ const schema = yup.object().shape({
     .oneOf([yup.ref("password")], "Passwords must match"),
 });
 
+const Signup = () => {
+  const onGoogleSubmit = async (data) => {
+   setAuthLoading(true);
+    const { name, email, sub } = data;
+    const value = {
+      name: name,
+      email: email,
+      password: sub,
+    };
+    await axios
+      .post("/auth/register", value)
+      .then((res) => {
+        console.log(res.data);
+        localStorage.setItem("token", res.data.accessToken);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
 
-const Login = () => {
+        navigate("/login");
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
 
+        toast.error("Error Occured");
+        console.log("an error occured", err);
+      });
+
+    reset(); // Clear form
+     setAuthLoading(false);
+  };
+
+  const [authLoading, setAuthLoading] = useState(false);
 
   const {
     register,
@@ -46,36 +74,39 @@ const Login = () => {
     resolver: yupResolver(schema),
   });
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const onSubmit = (value) => {
-    const {name,email,password} = value ;
-   const data = {
-    name:name,
-    email:email,
-    password:password
-   }    
-    axios.post('/auth/register',data).then((res)=>{
-      console.log(res.data)
-      localStorage.setItem("token",res.data.accessToken)
-      localStorage.setItem("user",JSON.stringify(res.data.user))
+  const onSubmit = async (value) => {
+    setAuthLoading(true);
+    const { name, email, password } = value;
+    const data = {
+      name: name,
+      email: email,
+      password: password,
+    };
+    await axios
+      .post("/auth/register", data)
+      .then((res) => {
+        console.log(res.data);
+        localStorage.setItem("token", res.data.accessToken);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
 
-       navigate("/login") 
-    }).catch((err)=>{
-console.log(err.response.data.message)
-      
-      toast.error("Error Occured")
-console.log("an error occured" , err)
-    })
+        navigate("/login");
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
 
-    
+        toast.error("Error Occured");
+        console.log("an error occured", err);
+      });
+
     reset(); // Clear form
+     setAuthLoading(false);
   };
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  
   return (
     <div className=" w-full flex flex-col items-center gap-4 bg-[rgb(236,253,245)] min-h-dvh pb-10 justify-center max-sm:px-6 font-font ">
       <div className=" justify-start flex gap-2.5 text-[rgb(100,116,139)] w-md max-sm:w-2xs pt-5 hover:text-teal transition duration-150 ease-in-out ">
@@ -197,8 +228,12 @@ console.log("an error occured" , err)
               </p>
             </div>
             <div className="py-4">
-              <button className=" text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition  duration-300 ease-in-out ">
-                Create Account
+              <button className=" text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition justify-center items-center flex duration-300 ease-in-out ">
+                {authLoading ? (
+                  <div className="w-7 h-7 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>
+                ) : (
+                  "Sign Up"
+                )}
               </button>
             </div>
           </form>
@@ -212,18 +247,30 @@ console.log("an error occured" , err)
             <div className="bg-teal h-[1px] w-[33.33333%] "></div>
           </div>
           <div className="  ">
-            <button className="flex items-center justify-center w-full border-gray-300 border-1 p-3 rounded-2xl hover:shadow">
+            {/* <button className="flex items-center justify-center w-full border-gray-300 border-1 p-3 rounded-2xl hover:shadow">
               <img src="/google.webp" alt="" className="w-5 h-5 mr-3 " />
               <h3 className="text-text/85 text-sm font-medium  ">
                 Continue with Google
               </h3>
-            </button>
+            </button> */}
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                const decoded = jwtDecode(credentialResponse.credential);
+                onGoogleSubmit(decoded);
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
           </div>
           <div className="flex items-center justify-center gap-1 p-4">
             <h3 className="text-text-muted text-base ">
               Already have an account?
             </h3>
-            <Link className="text-teal text-base  hover:text-teal-700 transition duration-200 ease-in-out " to={"/login"}>
+            <Link
+              className="text-teal text-base  hover:text-teal-700 transition duration-200 ease-in-out "
+              to={"/login"}
+            >
               Login
             </Link>
           </div>
@@ -233,4 +280,4 @@ console.log("an error occured" , err)
   );
 };
 
-export default Login;
+export default Signup;

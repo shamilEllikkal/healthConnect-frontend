@@ -1,8 +1,11 @@
-import React from 'react';
 
 const UserSettings = () => {
+ 
   return (
-   <div></div>
+   <div className='pl-70 bg-bg w-full min-h-dvh'><h1>
+   Coming soon....
+    </h1>
+    </div>
   );
 };
 

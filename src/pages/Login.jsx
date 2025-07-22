@@ -8,10 +8,13 @@ import {
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../axiosInstance";
 import toast from "react-hot-toast";
+import { GoogleLogin } from '@react-oauth/google';
+import {jwtDecode} from "jwt-decode";
+
 
 const schema = yup.object().shape({
   email: yup.string().email("*Invalid email").required("*Email is required"),
@@ -23,7 +26,7 @@ const schema = yup.object().shape({
 
 const Login = () => {
 
-  const [authLoading,setAuthLoading] = useState(false)
+  const [authLoading,setAuthLoading] = useState(false);
 
   const {
     register,
@@ -36,9 +39,31 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const onGoogleSubmit = async(data)=>{
+    console.log(data)
+    const {email,sub} = data;
+    const value = {email:email,password:sub}
+  await axios.post("/auth/login",value).then((res)=>{
+     localStorage.setItem("token", res.data.accessToken);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+       if( res.data.user.role=== "admin"){
+      navigate("/admin")
+    }else{
+      navigate("/dashboard/bookappointment");}
+      toast.success("Logined successfully.");
+    }).catch((err)=>{
+      console.log(err.response.data)
+      toast.error("User not Found")
+  })
+  }
+
+  useEffect(()=>{
+
+  })
+
   const onSubmit = async (data) => {
     setAuthLoading(true)
- await axios.post("/auth/login", data).then((res) => {
+ await axios.post("/auth/login", data  ).then((res) => {
       localStorage.setItem("token", res.data.accessToken);
       localStorage.setItem("user", JSON.stringify(res.data.user));
     if( res.data.user.role=== "admin"){
@@ -153,7 +178,7 @@ const Login = () => {
             </div>
             
             <button className=" flex items-center justify-center text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition  duration-300 ease-in-out ">
-             {authLoading ? (<div className="w-7 h-7 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : ("Sign Up")}
+             {authLoading ? (<div className="w-7 h-7 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : ("Sign In")}
             </button>
           </form>
         </div>
@@ -166,12 +191,21 @@ const Login = () => {
             <div className="bg-teal h-[1px] w-[33.33333%] "></div>
           </div>
           <div className="  ">
-            <button className="flex items-center justify-center w-full border-gray-300 border-1 p-3 rounded-2xl hover:shadow">
+            {/* <button className="flex items-center justify-center w-full border-gray-300 border-1 p-3 rounded-2xl hover:shadow">
               <img src="/google.webp" alt="" className="w-5 h-5 mr-3 " />
               <h3 className="text-text/85 text-sm font-medium  ">
                 Continue with Google
               </h3>
-            </button>
+            </button> */}
+            <GoogleLogin 
+  onSuccess={credentialResponse => {
+    const decoded = jwtDecode(credentialResponse.credential)
+   onGoogleSubmit(decoded)
+  }}
+  onError={() => {
+    console.log('Login Failed');
+  }}
+/>
           </div>
           <div className="flex items-center justify-center gap-1 p-4">
             <h3 className="text-text-muted text-base ">
