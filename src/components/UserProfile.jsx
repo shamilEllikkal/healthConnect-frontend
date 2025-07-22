@@ -121,7 +121,7 @@ const UserProfile = () => {
       const res = await axios.patch(`/user/update/${user.id}`, data);
       const updatedUser = { ...user, name: data.name };
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      await getProfile();
+      await editProfile()
       toast.success("Profile Updated");
       console.log(res.data);
     } catch (error) {
@@ -351,11 +351,11 @@ const UserProfile = () => {
                                             : baseStyles.borderWidth,
                                           borderColor: state.isFocused
                                             ? "#069494"
-                                            : baseStyles.borderColor,
+                                            : "#64748b",
 
                                           boxShadow: "none", // sometimes needed to override focus ring
                                           "&:hover": {
-                                            borderColor: "#069494",
+                                            borderColor: "",
                                           },
                                         };
                                       },
@@ -528,7 +528,7 @@ const UserProfile = () => {
                     {/* <button onClick={onCancel} className="inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-text-muted bg-white hover:bg-bg hover:text-text h-10 px-4 py-2">
                         Cancel
                       </button> */}
-                    <div
+                    <div id="submitBtn"
                       type="submit"
                       className="inline-flex  gap-2 items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-white h-10 px-4 py-2 bg-teal-500 hover:bg-teal-600"
                     >
@@ -537,7 +537,7 @@ const UserProfile = () => {
                       ) : (
                         <FontAwesomeIcon icon={faFloppyDisk} />
                       )}
-                      <button>Save Changes</button>
+                      <label htmlFor="submitBtn">Save Changes</label>
                     </div>
                   </div>
                 </div>
