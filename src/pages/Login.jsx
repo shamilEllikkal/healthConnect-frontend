@@ -8,7 +8,7 @@ import {
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../axiosInstance";
 import toast from "react-hot-toast";
@@ -40,6 +40,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const onGoogleSubmit = async(data)=>{
+    setAuthLoading(true)
     console.log(data)
     const {email,sub} = data;
     const value = {email:email,password:sub}
@@ -55,11 +56,9 @@ const Login = () => {
       console.log(err.response.data)
       toast.error("User not Found")
   })
+  setAuthLoading(false)
   }
 
-  useEffect(()=>{
-
-  })
 
   const onSubmit = async (data) => {
     setAuthLoading(true)
@@ -190,15 +189,15 @@ const Login = () => {
             </div>
             <div className="bg-teal h-[1px] w-[33.33333%] "></div>
           </div>
-          <div className="  ">
+          <div></div>
+          <div className="">
             {/* <button className="flex items-center justify-center w-full border-gray-300 border-1 p-3 rounded-2xl hover:shadow">
               <img src="/google.webp" alt="" className="w-5 h-5 mr-3 " />
               <h3 className="text-text/85 text-sm font-medium  ">
                 Continue with Google
               </h3>
             </button> */}
-            <GoogleLogin 
-  onSuccess={credentialResponse => {
+            <GoogleLogin  onSuccess={credentialResponse => {
     const decoded = jwtDecode(credentialResponse.credential)
    onGoogleSubmit(decoded)
   }}
