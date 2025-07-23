@@ -617,7 +617,8 @@ const BookAppointment = () => {
               </div>
               {appointment && (
                 <div className=" fixed inset-0 bg-black/40 z-60 backdrop-blur-sm min-h-dvh overflow-y-auto   ">
-                  <div className="absolute top-1/2 left-1/2 bg-white max-md:bg-teal max-sm:bg-amber-400 max-md:w-full -translate-x-1/2 -translate-y-1/2 w-[666px] max-h-[668px] overflow-y-auto rounded-xl">
+                  
+                  <div className="absolute top-1/2 left-1/2 bg-white max-md:w-full -translate-x-1/2 -translate-y-1/2 w-[666px] max-h-[668px] overflow-y-auto rounded-xl">
                     <div className="flex justify-between w-full  border-b-gray-200 border-b-1 p-6 ">
                       <h1 className=" text-2xl font-bold text-text">
                         Book Appointment
