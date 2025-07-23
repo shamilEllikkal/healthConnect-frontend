@@ -267,7 +267,10 @@ const BookAppointment = () => {
     setDoctorLoading(false);
   };
 
+
   const loadRazorpay = (order) => {
+    console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Or hardcode test key
       amount: order.amount,
@@ -310,8 +313,8 @@ const BookAppointment = () => {
         console.log("Payment ID:", response.razorpay_payment_id);
       },
       prefill: {
-        name: "Shamil E",
-        email: "shamil@example.com",
+        name: user.name,
+        email: user.email,
       },
       theme: {
         color: "#3399cc",

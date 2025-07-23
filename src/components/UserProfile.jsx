@@ -83,7 +83,7 @@ const UserProfile = () => {
     const updatedUser = { ...user, profile: profilePic.data.profilePicture };
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
-    await setProfileLoading(false);
+   setProfileLoading(false);
     toast.success("Profile Picture Updated");
   };
 
