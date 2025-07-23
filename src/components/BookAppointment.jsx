@@ -269,10 +269,9 @@ const BookAppointment = () => {
 
 
   const loadRazorpay = (order) => {
-    console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Or hardcode test key
+      key: "rzp_test_IGJRjtFqEWWxfG", // Or hardcode test key
       amount: order.amount,
       currency: order.currency,
       name: "HealthConnect",
