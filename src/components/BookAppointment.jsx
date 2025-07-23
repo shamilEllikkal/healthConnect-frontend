@@ -51,8 +51,6 @@ const BookAppointment = () => {
   const [selectHospital, setSelectHospital] = useState([]);
   const [selectLocation, setSelectLocation] = useState([]);
 
-
-
   const [selectedFilters, setSelectedFilters] = useState({
     location: null,
     speciality: null,
@@ -123,7 +121,7 @@ const BookAppointment = () => {
 
     const specialityName = item.speciality?.toLowerCase() || "";
     const spec =
-     searchParams.get("speciality")?.toLowerCase().trim().split(/\s+/) || [];
+      searchParams.get("speciality")?.toLowerCase().trim().split(/\s+/) || [];
 
     const matchesSpeciality = spec.every((spec) =>
       specialityName.includes(spec)
@@ -131,7 +129,7 @@ const BookAppointment = () => {
 
     const hospitalName = item.hospital?.toLowerCase() || "";
     const hos =
-     searchParams.get("hospital")?.toLowerCase().trim().split(/\s+/) || [];
+      searchParams.get("hospital")?.toLowerCase().trim().split(/\s+/) || [];
 
     const matchesHospital = hos.every((hos) => hospitalName.includes(hos));
 
@@ -204,38 +202,7 @@ const BookAppointment = () => {
   };
 
   const handleProceed = () => {
-    setPaymentLoading(true);
-    const { doctor, hospital, speciality, user_id, price } = Doctor;
-    const { time } = Time;
-
-    const data = {
-      doctor: doctor,
-      hospital: hospital,
-      speciality: speciality,
-      user_id: user_id,
-      fee: price,
-      time: time,
-      date: selected,
-    };
-    axios
-      .post("/appointments/book", data)
-      .then((res) => {
-        console.log(res.data);
-        toast.success("Appointment booked.");
-        setActiveDay(null);
-        setAppointment(false);
-        setToPayment(true);
-        setAtTime(null);
-      })
-      .catch((err) => {
-        // console.log(err.response.data.message)
-
-        toast.error("already booked");
-        console.log("an error occured", err);
-      })
-      .finally(() => {
-        setPaymentLoading(false);
-      });
+    console.log("handleProceed");
   };
 
   const handleClose = () => {
@@ -298,6 +265,69 @@ const BookAppointment = () => {
         toast.error("Network Error");
       });
     setDoctorLoading(false);
+  };
+
+  const loadRazorpay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Or hardcode test key
+      amount: order.amount,
+      currency: order.currency,
+      name: "HealthConnect",
+      description: "Test Transaction",
+      order_id: order.id,
+      handler: function (response) {
+        const { doctor, hospital, speciality, user_id, price } = Doctor;
+        const { time } = Time;
+
+        const data = {
+          doctor: doctor,
+          hospital: hospital,
+          speciality: speciality,
+          user_id: user_id,
+          fee: price,
+          time: time,
+          date: selected,
+        };
+        axios
+          .post("/appointments/book", data)
+          .then((res) => {
+            console.log(res.data);
+            toast.success("Appointment booked.");
+            setActiveDay(null);
+            setAppointment(false);
+            setToPayment(true);
+            setAtTime(null);
+          })
+          .catch((err) => {
+             setActiveDay(null);
+            setAppointment(false);
+            setToPayment(true);
+            setAtTime(null);
+            toast.error("Added to Queue, Please wait for confirmation.");
+            console.log("added to queue", err);
+          });
+        toast.success("Payment successful!");
+        console.log("Payment ID:", response.razorpay_payment_id);
+      },
+      prefill: {
+        name: "Shamil E",
+        email: "shamil@example.com",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const makePayment = async () => {
+    // console.log(Doctor)
+    setPaymentLoading(true);
+    const res = await axios.post("/create-order", { amount: Doctor.price });
+    loadRazorpay(res.data);
+    handleProceed();
+    setPaymentLoading(false);
   };
 
   useEffect(() => {
@@ -617,7 +647,6 @@ const BookAppointment = () => {
               </div>
               {appointment && (
                 <div className=" fixed inset-0 bg-black/40 z-60 backdrop-blur-sm min-h-dvh overflow-y-auto   ">
-                  
                   <div className="absolute top-1/2 left-1/2 bg-white max-md:w-full -translate-x-1/2 -translate-y-1/2 w-[666px] max-h-[668px] overflow-y-auto rounded-xl">
                     <div className="flex justify-between w-full  border-b-gray-200 border-b-1 p-6 ">
                       <h1 className=" text-2xl font-bold text-text">
@@ -792,7 +821,7 @@ const BookAppointment = () => {
                                   Back
                                 </button>
                                 <button
-                                  onClick={handleProceed}
+                                  onClick={makePayment}
                                   className="inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-teal hover:bg-teal/90 px-4 py-2 flex-1 h-12 gradient-teal text-white hover:shadow-lg transition-all duration-300"
                                 >
                                   {PaymentLoading ? (
