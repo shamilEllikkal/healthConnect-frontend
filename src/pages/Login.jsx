@@ -8,7 +8,7 @@ import {
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../axiosInstance";
 import toast from "react-hot-toast";
@@ -189,7 +189,6 @@ const Login = () => {
             </div>
             <div className="bg-teal h-[1px] w-[33.33333%] "></div>
           </div>
-          <div></div>
           <div className="">
             {/* <button className="flex items-center justify-center w-full border-gray-300 border-1 p-3 rounded-2xl hover:shadow">
               <img src="/google.webp" alt="" className="w-5 h-5 mr-3 " />
@@ -197,7 +196,8 @@ const Login = () => {
                 Continue with Google
               </h3>
             </button> */}
-            <GoogleLogin  onSuccess={credentialResponse => {
+            <GoogleLogin
+  onSuccess={credentialResponse => {
     const decoded = jwtDecode(credentialResponse.credential)
    onGoogleSubmit(decoded)
   }}

@@ -17,6 +17,18 @@ const gender = [
   { label: "Prefer not to say", value: "not-to-say" },
 ];
 
+const bloodGroup = [
+  { label: "A+", value: "a+" },
+  { label: "A-", value: "a-" },
+  { label: "B+", value: "b+" },
+  { label: "B-", value: "b-" },
+  { label: "AB+", value: "ab+" },
+  { label: "AB-", value: "ab-" },
+  { label: "O+", value: "o+" },
+  { label: "O-", value: "o-" },
+  { label: "Other", value: "other" },
+];
+
 const schema = yup.object().shape({
   name: yup
     .string()
@@ -121,7 +133,7 @@ const UserProfile = () => {
       const res = await axios.patch(`/user/update/${user.id}`, data);
       const updatedUser = { ...user, name: data.name };
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      await editProfile()
+      await editProfile();
       toast.success("Profile Updated");
       console.log(res.data);
     } catch (error) {
@@ -334,7 +346,7 @@ const UserProfile = () => {
                                 rules={{ required: true }}
                                 render={({ field }) => (
                                   <Select
-                                   {...field.value}
+                                    {...field.value}
                                     styles={{
                                       control: (baseStyles, state) => {
                                         // remove borderColor from baseStyles
@@ -361,8 +373,12 @@ const UserProfile = () => {
                                       },
                                     }}
                                     options={gender}
-                                    onChange={(option) => field.onChange(option?.value)} // only pass string
-                                    value={gender.find(option => option.value === field.value)}
+                                    onChange={(option) =>
+                                      field.onChange(option?.value)
+                                    } // only pass string
+                                    value={gender.find(
+                                      (option) => option.value === field.value
+                                    )}
                                     isSearchable
                                     isClearable
                                     placeholder="Select Your Gender"
@@ -445,12 +461,57 @@ const UserProfile = () => {
                               {" "}
                               Blood Type
                             </label>
-                            <input
+                            {/* <input
                               placeholder="eg: O+"
                               {...register("bloodGroup")}
                               className="flex h-10 w-full rounded-xl border  border-text-muted bg-white px-3 py-2 text-sm ring-offset-bg file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal disabled:cursor-not-allowed disabled:opacity-50 mt-2"
                               type="text"
                               id="hobbies"
+                            /> */}
+                            <Controller
+                              name="bloodGroup"
+                              control={control}
+                              rules={{ required: true }}
+                              render={({ field }) => (
+                                <Select
+                                  {...field.value}
+                                  styles={{
+                                    control: (baseStyles, state) => {
+                                      // remove borderColor from baseStyles
+                                      const { borderColor, ...filteredBase } =
+                                        baseStyles;
+
+                                      return {
+                                        ...filteredBase, // spread everything except default borderColor
+                                        borderRadius: "12px",
+                                        marginTop: "8px",
+                                        height: "40px",
+                                        borderWidth: state.isFocused
+                                          ? "3px"
+                                          : baseStyles.borderWidth,
+                                        borderColor: state.isFocused
+                                          ? "#069494"
+                                          : "#64748b",
+
+                                        boxShadow: "none", // sometimes needed to override focus ring
+                                        "&:hover": {
+                                          borderColor: "",
+                                        },
+                                      };
+                                    },
+                                  }}
+                                  options={bloodGroup}
+                                  onChange={(option) =>
+                                    field.onChange(option?.value)
+                                  } // only pass string
+                                  value={bloodGroup.find(
+                                    (option) => option.value === field.value
+                                  )}
+                                  isSearchable
+                                  isClearable
+                                  placeholder="Select Your Blood Type"
+                                />
+                              )}
                             />
                             <p className=" text-red-600 text-sm p-0.5 ">
                               {errors.bloodGroup?.message}
@@ -528,16 +589,23 @@ const UserProfile = () => {
                     {/* <button onClick={onCancel} className="inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-text-muted bg-white hover:bg-bg hover:text-text h-10 px-4 py-2">
                         Cancel
                       </button> */}
-                    <div id="submitBtn"
-                      type="submit"
-                      className="inline-flex  gap-2 items-center justify-center whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-white h-10 px-4 py-2 bg-teal-500 hover:bg-teal-600"
-                    >
+                    <div className="relative" type="submit">
                       {saveLoading ? (
-                        <div className="w-5 h-5 border-4 border-white border-t-teal-700 rounded-full animate-spin"></div>
+                        <div className="w-5 h-5 border-4 absolute top-[50%] -translate-y-1/2 left-2 px-1  border-white border-t-teal-700 rounded-full animate-spin"></div>
                       ) : (
-                        <FontAwesomeIcon icon={faFloppyDisk} />
+                        <FontAwesomeIcon
+                          className="absolute pl-0.5 top-[50%] text-white -translate-y-1/2 left-2"
+                          type="submit"
+                          icon={faFloppyDisk}
+                        />
                       )}
-                      <label htmlFor="submitBtn">Save Changes</label>
+
+                      <button
+                        className="inline-flex  gap-2 items-center justify-center pl-8 whitespace-nowrap rounded-2xl text-sm font-medium ring-offset-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-white h-10 px-4 py-2 bg-teal-500 hover:bg-teal-600"
+                        type="submit"
+                      >
+                        Save Changes
+                      </button>
                     </div>
                   </div>
                 </div>
