@@ -12,10 +12,9 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../axiosInstance";
 import toast from "react-hot-toast";
-import { GoogleLogin } from '@react-oauth/google';
-import {jwtDecode} from "jwt-decode";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
-
 
 const schema = yup.object().shape({
   email: yup.string().email("*Invalid email").required("*Email is required"),
@@ -26,8 +25,7 @@ const schema = yup.object().shape({
 });
 
 const Login = () => {
-
-  const [authLoading,setAuthLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
 
   const {
     register,
@@ -40,51 +38,59 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const onGoogleSubmit = async(data)=>{
-    setAuthLoading(true)
-    console.log(data)
-    const {name,email,sub} = data;
-    const value = {name:name,email:email,password:sub}
-  await axios.post("/auth/google",value).then((res)=>{
-     Cookies.set("token", res.data.accessToken, {
-  expires: 1, // expires in 1 day
-  path: "/",
-  secure: true,
-  sameSite: "Strict",
-})
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-       if( res.data.user.role=== "admin"){
-      navigate("/admin")
-    }else{
-      navigate("/dashboard/bookappointment");}
-      toast.success("Logined successfully.");
-    }).catch((err)=>{
-      console.log(err.response.data)
-      toast.error("User not Found")
-  })
-  setAuthLoading(false)
-  }
-
+  const onGoogleSubmit = async (data) => {
+    setAuthLoading(true);
+    console.log(data);
+    const { name, email, sub } = data;
+    const value = { name: name, email: email, password: sub };
+    await axios
+      .post("/auth/google", value)
+      .then((res) => {
+        Cookies.set("token", res.data.accessToken, {
+          expires: 1, // expires in 1 day
+          path: "/",
+          secure: true,
+          sameSite: "Strict",
+        });
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        if (res.data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard/bookappointment");
+        }
+        toast.success("Logined successfully.");
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        toast.error("User not Found");
+      });
+    setAuthLoading(false);
+  };
 
   const onSubmit = async (data) => {
     // console.log(data)
-    setAuthLoading(true)
- await axios.post("/auth/login", data  ).then((res) => {
- Cookies.set("token", res.data.accessToken, {
-path: "/",
-})
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-    if( res.data.user.role=== "admin"){
-      navigate("/admin")
-    }else{
-      navigate("/dashboard/bookappointment");}
-      toast.success("Logined successfully.");
-    }).catch((err)=>{
-      console.log(err.response?.data)
-      toast.error("User not Found")
-    })
+    setAuthLoading(true);
+    await axios
+      .post("/auth/login", data)
+      .then((res) => {
+        Cookies.set("token", res.data.accessToken, {
+          path: "/",
+        });
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        Cookies.set("refresh", res.data.refreshToken);
+        if (res.data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard/bookappointment");
+        }
+        toast.success("Logined successfully.");
+      })
+      .catch((err) => {
+        console.log(err.response?.data);
+        toast.error("User not Found");
+      });
     reset(); // Clear form
-    setAuthLoading(false)
+    setAuthLoading(false);
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -184,9 +190,13 @@ path: "/",
                 Forgot Password?
               </a>
             </div>
-            
+
             <button className=" flex items-center justify-center text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition  duration-300 ease-in-out ">
-             {authLoading ? (<div className="w-7 h-7 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>) : ("Sign In")}
+              {authLoading ? (
+                <div className="w-7 h-7 border-4 border-white border-t-teal-600 rounded-full animate-spin"></div>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
         </div>
@@ -206,14 +216,14 @@ path: "/",
               </h3>
             </button> */}
             <GoogleLogin
-  onSuccess={credentialResponse => {
-    const decoded = jwtDecode(credentialResponse.credential)
-   onGoogleSubmit(decoded)
-  }}
-  onError={() => {
-    console.log('Login Failed');
-  }}
-/>
+              onSuccess={(credentialResponse) => {
+                const decoded = jwtDecode(credentialResponse.credential);
+                onGoogleSubmit(decoded);
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
           </div>
           <div className="flex items-center justify-center gap-1 p-4">
             <h3 className="text-text-muted text-base ">

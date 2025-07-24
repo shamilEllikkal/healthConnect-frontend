@@ -1,10 +1,14 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+
+
 const axiosInstance = axios.create({
     baseURL:"https://healthconnect-backend-0yfr.onrender.com/api",
     // withCredentials: true,
 })
+
+
 
 axiosInstance.interceptors.request.use(
     (config)=>{
@@ -21,8 +25,27 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response)=>response,
     (error)=>{
-            if(error.response?.status=== 401){
-                console.warn("Unautherized , redicting to login.....");
+
+  const originalRequest = error.config;
+
+            if(error.response?.status=== 401 && !originalRequest._retry &&
+      Cookies.get("refresh")){
+           
+ originalRequest._retry = true;
+ const refreshToken = Cookies.get("refresh");
+ const res = axios.post("https://your-api.com/api/auth/refresh", { refreshToken });
+
+   const newAccessToken = res.data.accessToken;
+
+        // Update cookie
+        Cookies.set("token", newAccessToken);
+
+        // Retry original request
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return axiosInstance(originalRequest);
+
+            }else{
+                   console.warn("Unautherized , redicting to login.....");
                Cookies.remove("token", { path: "/" });
                 window.location.href = "/"
             }
