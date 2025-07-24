@@ -14,6 +14,7 @@ import axios from "../axiosInstance";
 import toast from "react-hot-toast";
 import { GoogleLogin } from '@react-oauth/google';
 import {jwtDecode} from "jwt-decode";
+import Cookies from "js-cookie";
 
 
 const schema = yup.object().shape({
@@ -45,7 +46,12 @@ const Login = () => {
     const {email,sub} = data;
     const value = {email:email,password:sub}
   await axios.post("/auth/login",value).then((res)=>{
-     localStorage.setItem("token", res.data.accessToken);
+     Cookies.set("token", res.data.accessToken, {
+  expires: 1, // expires in 1 day
+  path: "/",
+  secure: true,
+  sameSite: "Strict",
+})
       localStorage.setItem("user", JSON.stringify(res.data.user));
        if( res.data.user.role=== "admin"){
       navigate("/admin")
@@ -61,9 +67,12 @@ const Login = () => {
 
 
   const onSubmit = async (data) => {
+    // console.log(data)
     setAuthLoading(true)
  await axios.post("/auth/login", data  ).then((res) => {
-      localStorage.setItem("token", res.data.accessToken);
+ Cookies.set("token", res.data.accessToken, {
+path: "/",
+})
       localStorage.setItem("user", JSON.stringify(res.data.user));
     if( res.data.user.role=== "admin"){
       navigate("/admin")
@@ -71,7 +80,7 @@ const Login = () => {
       navigate("/dashboard/bookappointment");}
       toast.success("Logined successfully.");
     }).catch((err)=>{
-      console.log(err.response.data)
+      console.log(err.response?.data)
       toast.error("User not Found")
     })
     reset(); // Clear form

@@ -26,8 +26,8 @@ function App() {
        <Route path="/" element={ <HomePage /> } />
       <Route element={<ProtectRouter />} > 
         <Route path="/dashboard" element={ <Dashboard /> }>
-          <Route path="myappointment" element={ <MyAppointment /> } />
             <Route path="bookappointment" element={ <BookAppointment /> } />
+          <Route path="myappointment" element={ <MyAppointment /> } />
              <Route path="profile" element={ <UserProfile /> } />
                <Route path="settings" element={ <UserSettings /> } />
           </Route>

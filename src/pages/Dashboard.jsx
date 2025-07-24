@@ -10,6 +10,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import useVisibilityStore from "../store/barStore";
+import Cookies from "js-cookie";
 
 const Dashboard = () => {
   
@@ -17,7 +18,7 @@ const Dashboard = () => {
   const toggleVisibility = useVisibilityStore((state)=>state.toggleVisibility);
 
   const handleSignout = ()=>{
-    localStorage.removeItem("token")
+   Cookies.remove("token", { path: "/" });
      localStorage.removeItem("user")
      
    
@@ -96,7 +97,7 @@ const Dashboard = () => {
             <span>Settings</span>
           </NavLink>
         </div>
-        <div className="space-y-2 px-4 py-6 w-64">
+        <div className="space-y-2 fixed bottom-0 px-4 py-6 w-64">
          <NavLink onClick={toggleVisibility && handleSignout}
             to="/"
             className={({ isActive }) => `flex items-center text-sm gap-3 font-medium  h-11 px-4 py-3 rounded-2xl transfrom duration-300 ease-in-out
