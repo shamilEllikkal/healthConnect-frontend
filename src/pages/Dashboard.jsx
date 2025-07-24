@@ -28,7 +28,7 @@ const Dashboard = () => {
   return (
     <>
     <div  className={isVisible ? "" : "max-sm:bg-black/10 max-sm:backdrop-blur-sm z-100 max-sm:w-full max-sm:min-h-dvh max-sm:fixed"}>
- <div className={isVisible ? "max-sm:hidden z-90" : "block"} > <div className="w-64 flex flex-col h-screen justify-between fixed z-10 bg-white  ">
+ <div className={isVisible ? "max-sm:hidden z-90" : "block"} > <div className="w-64 flex flex-col min-h-dvh justify-between fixed z-10 bg-white   ">
         <div className="flex justify-between px-3 ">
           <div className="flex items-center gap-3 h-16">
             <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-700 flex items-center justify-center rounded-xl text-lg text-white  ">

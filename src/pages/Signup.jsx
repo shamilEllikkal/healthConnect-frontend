@@ -15,6 +15,7 @@ import axios from "../axiosInstance.js";
 import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
 import { GoogleLogin } from "@react-oauth/google";
+import Cookies from "js-cookie";
 
 const schema = yup.object().shape({
   name: yup
@@ -35,35 +36,37 @@ const schema = yup.object().shape({
 });
 
 const Signup = () => {
-  const onGoogleSubmit = async (data) => {
-   setAuthLoading(true);
-    const { name, email, sub } = data;
-    const value = {
-      name: name,
-      email: email,
-      password: sub,
-    };
-    await axios
-      .post("/auth/register", value)
-      .then((res) => {
-        console.log(res.data);
-        localStorage.setItem("token", res.data.accessToken);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
 
-        navigate("/login");
-      })
-      .catch((err) => {
-        console.log(err.response.data.message);
-
-        toast.error("Error Occured");
-        console.log("an error occured", err);
-      });
-
-    reset(); // Clear form
-     setAuthLoading(false);
-  };
 
   const [authLoading, setAuthLoading] = useState(false);
+
+  const onGoogleSubmit = async (data) => {
+    setAuthLoading(true);
+    const { name, email, sub } = data;
+    const value = { name: name, email: email, password: sub };
+    await axios
+      .post("/auth/google", value)
+      .then((res) => {
+        Cookies.set("token", res.data.accessToken, {
+          expires: 1, // expires in 1 day
+          path: "/",
+          secure: true,
+          sameSite: "Strict",
+        });
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        if (res.data.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard/bookappointment");
+        }
+        toast.success("Logined successfully.");
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        toast.error("User not Found");
+      });
+    setAuthLoading(false);
+  };
 
   const {
     register,
@@ -101,7 +104,7 @@ const Signup = () => {
       });
 
     reset(); // Clear form
-     setAuthLoading(false);
+    setAuthLoading(false);
   };
 
   const [showPassword, setShowPassword] = useState(false);

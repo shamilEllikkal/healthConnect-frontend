@@ -571,7 +571,7 @@ const BookAppointment = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3  max-lg:grid-cols-1 max-xl:grid-cols-2 p-6 pt-0 gap-4">
+                    <div className="grid grid-cols-3  max-lg:grid-cols-1 max-xl:grid-cols-2 max-md:p-3 p-6 pt-0 gap-4">
                       {filtered.map((doctor) => (
                         <div
                           key={doctor._id}

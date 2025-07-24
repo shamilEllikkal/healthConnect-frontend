@@ -43,9 +43,9 @@ const Login = () => {
   const onGoogleSubmit = async(data)=>{
     setAuthLoading(true)
     console.log(data)
-    const {email,sub} = data;
-    const value = {email:email,password:sub}
-  await axios.post("/auth/login",value).then((res)=>{
+    const {name,email,sub} = data;
+    const value = {name:name,email:email,password:sub}
+  await axios.post("/auth/google",value).then((res)=>{
      Cookies.set("token", res.data.accessToken, {
   expires: 1, // expires in 1 day
   path: "/",
