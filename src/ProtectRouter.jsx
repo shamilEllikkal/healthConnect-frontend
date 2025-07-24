@@ -25,7 +25,7 @@ const ProtectRouter = () => {
     };
 
     userData();
-  }, []);
+  });
 
   if (loading) return null;
 
