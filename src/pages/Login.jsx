@@ -43,14 +43,15 @@ const Login = () => {
     console.log(data);
     const { name, email, sub } = data;
     const value = { name: name, email: email, password: sub };
+
     await axios
       .post("/auth/google", value)
       .then((res) => {
+        console.log(res.data, "Google Login Response");
         Cookies.set("token", res.data.accessToken, {
-          expires: 1, // expires in 1 day
+       
           path: "/",
-          secure: true,
-          sameSite: "Strict",
+        
         });
         localStorage.setItem("user", JSON.stringify(res.data.user));
         if (res.data.user.role === "admin") {
@@ -183,12 +184,12 @@ const Login = () => {
                   Remember me
                 </label>
               </div>
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-teal text-[14px] font-medium hover:text-teal-600 transition duration-300 ease-in-out "
               >
                 Forgot Password?
-              </a>
+              </Link>
             </div>
 
             <button className=" flex items-center justify-center text-[18px] h-[48px] w-full text-white bg-gradient-to-br from-teal-400 to-teal-700 font-medium text-lg  py-2 px-4 rounded-xl hover:shadow-lg transition  duration-300 ease-in-out ">

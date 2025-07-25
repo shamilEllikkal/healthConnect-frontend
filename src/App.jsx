@@ -12,6 +12,9 @@ import Dashboard from "./pages/Dashboard";
 import UserProfile from "./components/UserProfile";
 import UserSettings from "./components/UserSettings";
 import Admin from "./pages/Admin";
+import ForgotPassword from "./pages/ForgotPassword";
+import VerifyOtp from "./pages/VerifyOtp";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -24,6 +27,12 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
        <Route path="/" element={ <HomePage /> } />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+
+
       <Route element={<ProtectRouter />} > 
         <Route path="/dashboard" element={ <Dashboard /> }>
             <Route path="bookappointment" element={ <BookAppointment /> } />

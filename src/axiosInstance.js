@@ -10,9 +10,8 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = Cookies.get("token");
     if (token) {
-      config.headers.Authorization = `bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`; // Capital B
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -20,7 +19,7 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const originalRequest = error.config;
 
     if (
@@ -29,27 +28,36 @@ axiosInstance.interceptors.response.use(
       Cookies.get("refresh")
     ) {
       originalRequest._retry = true;
-      const refreshToken = Cookies.get("refresh");
-      const res = axios.post("https://your-api.com/api/auth/refresh", {
-        refreshToken,
-      });
-
-      const newAccessToken = res.data.accessToken;
-
-      // Update cookie
-      Cookies.set("token", newAccessToken);
-
-      // Retry original request
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-      return axiosInstance(originalRequest);
-    } else {
-      console.warn("Unautherized , redicting to login.....");
-      Cookies.remove("token", { path: "/" });
-      Cookies.remove("refresh", { path: "/" });
-      window.location.href = "/";
+      try {
+        const refreshToken = Cookies.get("refresh");
+        const res = await axios.post(
+          "https://healthconnect-backend-0yfr.onrender.com/api/auth/refresh",
+          { refreshToken }
+        );
+        const newAccessToken = res.data.accessToken;
+        Cookies.set("token", newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        Cookies.remove("token", { path: "/" });
+        Cookies.remove("refresh", { path: "/" });
+        window.location.href = "/"; // Redirect to login
+        return Promise.reject(refreshError);
+      }
+    }  else {
+      // Only redirect if NOT an OTP or auth endpoint
+      const url = originalRequest.url || "";
+      if (
+        !url.includes("/auth/verifyotp") &&
+        !url.includes("/auth/forgotpassword") &&
+        !url.includes("/auth/resetpassword")
+      ) {
+        Cookies.remove("token", { path: "/" });
+        Cookies.remove("refresh", { path: "/" });
+        window.location.href = "/";
+      }
     }
     return Promise.reject(error);
   }
 );
-
 export default axiosInstance;
