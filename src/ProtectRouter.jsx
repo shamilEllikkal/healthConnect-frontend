@@ -15,7 +15,6 @@ const ProtectRouter = () => {
         if (res.data) {
           const tokenFromCookie = Cookies.get("token");
           setToken(tokenFromCookie);
-          console.log(token,"token")
         }
       } catch (err) {
         console.error("Auth check failed", err);

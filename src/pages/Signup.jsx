@@ -87,6 +87,7 @@ const Signup = () => {
       email: email,
       password: password,
     };
+    console.log(data, "data");
     await axios
       .post("/auth/register", data)
       .then((res) => {
@@ -98,8 +99,7 @@ const Signup = () => {
       })
       .catch((err) => {
         console.log(err.response.data.message);
-
-        toast.error("Error Occured");
+        toast.error(err.response.data.message);
         console.log("an error occured", err);
       });
 
