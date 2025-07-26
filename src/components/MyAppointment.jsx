@@ -77,7 +77,7 @@ const MyAppointment = () => {
                     <div className="flex items-center space-x-4">
                       <div className="flex-1 space-y-2">
                         <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-1600 w-2/5"></div>
-                        <div className="h-3 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-1700 w-3/5"></div>
+                        <div className="h-3 bg-gradien  t-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] rounded animate-[shimmer_2s_infinite] delay-1700 w-3/5"></div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">

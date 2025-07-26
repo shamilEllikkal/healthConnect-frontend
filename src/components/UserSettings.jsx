@@ -1,6 +1,6 @@
-
+import Snackbar from "@mui/material/Snackbar";
 // const UserSettings = () => {
- 
+
 //   return (
 //    <div className='pl-70 bg-bg w-full min-h-dvh'><h1>
 //    Coming soon....
@@ -12,18 +12,17 @@
 
 // export default UserSettings;
 
- //label on save Changes
-           //disabled on booking
-           //same email diff pass issue
-           //input select fetch data and search
-           //google integration
+//label on save Changes
+//disabled on booking
+//same email diff pass issue
+//input select fetch data and search
+//google integration
 
-
-           import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 
 export default function UserSettings() {
   const length = 6; // Change to 4 if needed
-  const [otp, setOtp] = useState(Array(length).fill(''));
+  const [otp, setOtp] = useState(Array(length).fill(""));
   const inputsRef = useRef([]);
 
   const handleChange = (value, index) => {
@@ -39,24 +38,24 @@ export default function UserSettings() {
   };
 
   const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputsRef.current[index - 1]?.focus();
     }
   };
 
   const handlePaste = (e) => {
-    const paste = e.clipboardData.getData('text').slice(0, length);
+    const paste = e.clipboardData.getData("text").slice(0, length);
     if (!/^\d+$/.test(paste)) return;
 
-    const newOtp = paste.split('').slice(0, length);
-    setOtp([...newOtp, ...Array(length - newOtp.length).fill('')]);
+    const newOtp = paste.split("").slice(0, length);
+    setOtp([...newOtp, ...Array(length - newOtp.length).fill("")]);
 
     const lastIndex = Math.min(paste.length, length) - 1;
     inputsRef.current[lastIndex]?.focus();
   };
 
   const handleSubmit = () => {
-    alert(`Entered OTP: ${otp.join('')}`);
+    alert(`Entered OTP: ${otp.join("")}`);
     // You can send to backend here
   };
 
@@ -80,10 +79,18 @@ export default function UserSettings() {
         ))}
       </div>
 
+      <Snackbar
+        open={true}
+        autoHideDuration={6000}
+        // onClose={handleClose}
+        message="Note archived"
+        // action={action}
+      />
+
       <button
         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
         onClick={handleSubmit}
-        disabled={otp.join('').length !== length}
+        disabled={otp.join("").length !== length}
       >
         Verify
       </button>

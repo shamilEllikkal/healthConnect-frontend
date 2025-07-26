@@ -31,7 +31,7 @@ const ForgotPassword = () => {
 
   const onSubmit = async(data) =>{
     setAuthLoading(true)
- const res = await axios.post("auth/forgot-password",data).then((res)=>{
+ const res = await axios.post("auth/forgotpassword",data).then((res)=>{
 
       if (res.status === 200) {
         toast.success("OTP sent to your email");

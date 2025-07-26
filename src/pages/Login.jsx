@@ -88,7 +88,7 @@ const Login = () => {
       })
       .catch((err) => {
         console.log(err.response?.data);
-        toast.error("User not Found");
+        toast.error("Invalid email or password");
       });
     reset(); // Clear form
     setAuthLoading(false);

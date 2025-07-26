@@ -87,11 +87,9 @@ const Signup = () => {
       email: email,
       password: password,
     };
-    console.log(data, "data");
     await axios
       .post("/auth/register", data)
       .then((res) => {
-        console.log(res.data);
         localStorage.setItem("token", res.data.accessToken);
         localStorage.setItem("user", JSON.stringify(res.data.user));
 
@@ -100,7 +98,6 @@ const Signup = () => {
       .catch((err) => {
         console.log(err.response.data.message);
         toast.error(err.response.data.message);
-        console.log("an error occured", err);
       });
 
     reset(); // Clear form

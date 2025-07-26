@@ -86,7 +86,7 @@ const VerifyOtp = () => {
     // setCanResend(false);
     const email = localStorage.getItem("email");
     axios
-      .post("/auth/forgot-password", { email: email })
+      .post("/auth/forgotpassword", { email: email })
       .then((res) => {
         if (res.status === 200) {
           toast.success("OTP resent successfully");

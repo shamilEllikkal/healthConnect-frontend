@@ -83,7 +83,7 @@ const UserProfile = () => {
     const updatedUser = { ...user, profile: profilePic.data.profilePicture };
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
-   setProfileLoading(false);
+    setProfileLoading(false);
     toast.success("Profile Picture Updated");
   };
 
@@ -350,8 +350,7 @@ const UserProfile = () => {
                                     styles={{
                                       control: (baseStyles, state) => {
                                         // remove borderColor from baseStyles
-                                        const { borderColor, ...filteredBase } =
-                                          baseStyles;
+                                        const { ...filteredBase } = baseStyles;
 
                                         return {
                                           ...filteredBase, // spread everything except default borderColor
@@ -474,12 +473,11 @@ const UserProfile = () => {
                               rules={{ required: true }}
                               render={({ field }) => (
                                 <Select
-                                  {...field.value}
+                                  {...field.value}  
                                   styles={{
                                     control: (baseStyles, state) => {
                                       // remove borderColor from baseStyles
-                                      const { borderColor, ...filteredBase } =
-                                        baseStyles;
+                                      const { ...filteredBase } = baseStyles;
 
                                       return {
                                         ...filteredBase, // spread everything except default borderColor
