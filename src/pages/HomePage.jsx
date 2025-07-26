@@ -84,8 +84,8 @@ const HomePage = () => {
             </div>
 
             <img
-              className="w-125 h-125 bg-gray-200 rounded-2xl max-xl:w-112 max-xl:h-112 max-md:w-75 max-md:h-75 animate-float object-cover z-4"
-              src="null"
+              className="w-125 border-0 h-125 bg-gray-200 rounded-2xl max-xl:w-112 max-xl:h-112 max-md:w-75 max-md:h-75 animate-float object-cover z-4"
+              src="/placeholder.svg"
               alt=""
             />
 
