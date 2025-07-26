@@ -264,11 +264,11 @@ const Signup = () => {
             />
           </div>
           <div className="flex justify-between text-center gap-1 p-4">
-            <h3 className="text-text-muted w-full text-base ">
+            <h3 className="text-text-muted max-sm:w-full text-base ">
               Already have an account?
             </h3>
             <Link
-              className="text-teal text-base w-full hover:text-teal-700 transition duration-200 ease-in-out "
+              className="text-teal text-base max-sm:w-full hover:text-teal-700 transition duration-200 ease-in-out "
               to={"/login"}
             >
               Login
