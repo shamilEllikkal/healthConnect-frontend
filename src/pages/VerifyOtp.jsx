@@ -136,7 +136,7 @@ const VerifyOtp = () => {
               <OneTimePasswordField.Root
                 value={otp}
                 onChange={handleOtpChange}
-                className="flex gap-2 flex-nowrap"
+                className="flex gap-2 max-sm:gap-1 flex-nowrap"
               >
                 {[...Array(6)].map((_, idx) => (
                   <OneTimePasswordField.Input
@@ -145,7 +145,7 @@ const VerifyOtp = () => {
                     maxLength={1}
                     value={otp[idx] || ""}
                     onChange={(e) => handleInputChange(e, idx)}
-                    className="w-12 h-12 text-center rounded-xl border-2 border-black/60 shadow-sm outline-none focus:border-teal text-black/90 text-xl hover:shadow-md"
+                    className="w-12 h-12 max-sm:w-10 max-sm:h-10  text-center rounded-xl border-2 border-black/60 shadow-sm outline-none focus:border-teal text-black/90 text-xl hover:shadow-md"
                   />
                 ))}
                 <OneTimePasswordField.HiddenInput />
@@ -194,7 +194,7 @@ const VerifyOtp = () => {
           </div>
         </div>
         <div className="px-6 w-full">
-          <div className="flex items-center justify-center gap-1 p-4">
+          <div className="flex justify-between text-center gap-1 p-4">
             <h3 className="text-text-muted text-base ">Wrong email address?</h3>
             <Link
               className="text-teal text-base hover:text-teal-700 transition duration-200 ease-in-out "

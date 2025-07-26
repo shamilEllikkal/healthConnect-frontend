@@ -226,7 +226,7 @@ const Login = () => {
               }}
             />
           </div>
-          <div className="flex items-center justify-center gap-1 p-4">
+          <div className="flex justify-between text-center gap-1 p-4">
             <h3 className="text-text-muted text-base ">
               Don't have an account?
             </h3>

@@ -263,12 +263,12 @@ const Signup = () => {
               }}
             />
           </div>
-          <div className="flex items-center justify-center gap-1 p-4">
-            <h3 className="text-text-muted text-base ">
+          <div className="flex justify-between text-center gap-1 p-4">
+            <h3 className="text-text-muted w-full text-base ">
               Already have an account?
             </h3>
             <Link
-              className="text-teal text-base  hover:text-teal-700 transition duration-200 ease-in-out "
+              className="text-teal text-base w-full hover:text-teal-700 transition duration-200 ease-in-out "
               to={"/login"}
             >
               Login

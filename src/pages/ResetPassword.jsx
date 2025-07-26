@@ -125,12 +125,12 @@ const ResetPassword = () => {
         </div>
         <div className="px-6 w-full">
         
-          <div className="flex items-center justify-center gap-1 p-4">
-            <h3 className="text-text-muted text-base ">
+          <div className="flex justify-between text-center gap-1 py-4">
+            <h3 className="text-text-muted w-full text-base ">
           Remember your password?
             </h3>
             <Link
-              className="text-teal text-base hover:text-teal-700 transition duration-200 ease-in-out "
+              className="text-teal w-full text-base  hover:text-teal-700 transition duration-200 ease-in-out "
               to={"/login"}
             >
               Sign In
